@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2011 Google Inc. All rights reserved.
+ * Copyright 2014 Google Inc. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 goog.provide('e2e.ecc.eccTester');
 
 goog.require('e2e.ecc.DomainParam');
+goog.require('e2e.ecc.Ecdh');
 goog.require('e2e.ecc.Ecdsa');
 goog.require('e2e.ecc.Protocol');
 goog.require('e2e.testing.Util');
@@ -30,12 +31,12 @@ goog.setTestOnly('eccTester');
 
 
 /**
- * Benchmarks for a given curve.
+ * Benchmarks ECDSA and group operations for a given curve.
  * @param {!e2e.ecc.PrimeCurve.<string>} curve The curve
  * @return {!Object.<string,Object>} Performance stats (object is filled only
  *     when tests are run outside browser).
  */
-e2e.ecc.eccTester.runBenchmarkForCurve = function(curve) {
+e2e.ecc.eccTester.runEcdsaBenchmarkForCurve = function(curve) {
   var message = 'Whisky bueno: ¡excitad mi frágil pequeña vejez!';
   var params = e2e.ecc.DomainParam.fromCurve(curve);
   var keypair = e2e.ecc.Protocol.generateKeyPair(curve);
@@ -57,5 +58,28 @@ e2e.ecc.eccTester.runBenchmarkForCurve = function(curve) {
   e2e.testing.Util.addBenchmark(tests,
       function() { ecdsa.verify(message, signature); },
       curve + ' Verify');
-  return e2e.testing.Util.runPerfTests(tests, 10, 10000);
+  return e2e.testing.Util.runPerfTests(tests, 20, 10000);
+};
+
+
+/**
+ * Benchmarks ECDH on a given curve.
+ * @param {!e2e.ecc.PrimeCurve.<string>} curveName The curve
+ * @return {!Object.<string,Object>} Performance stats (object is filled only
+ *     when tests are run outside browser).
+ */
+e2e.ecc.eccTester.runEcdhBenchmarkForCurve = function(curveName) {
+  var message = 'Whisky bueno: ¡excitad mi frágil pequeña vejez!';
+
+  var pubkey = e2e.ecc.Protocol.generateKeyPair(curveName)['pubKey'];
+  var ecdh = new e2e.ecc.Ecdh(curveName);
+
+  var tests = [];
+  e2e.testing.Util.addBenchmark(tests,
+      function() { e2e.ecc.Protocol.generateKeyPair(curveName); },
+      curveName + ' Keygen');
+  e2e.testing.Util.addBenchmark(tests,
+      function() { ecdh.alice(pubkey); },
+      curveName + ' ECDH');
+  return e2e.testing.Util.runPerfTests(tests, 20, 10000);
 };

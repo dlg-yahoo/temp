@@ -34,18 +34,38 @@ function shouldRunTests() {
 }
 
 function testP256() {
-  e2e.ecc.eccTester.runBenchmarkForCurve(
+  e2e.ecc.eccTester.runEcdsaBenchmarkForCurve(
     e2e.ecc.PrimeCurve.P_256);
 }
 
 function testP834() {
-  e2e.ecc.eccTester.runBenchmarkForCurve(
+  e2e.ecc.eccTester.runEcdsaBenchmarkForCurve(
     e2e.ecc.PrimeCurve.P_384);
 }
 
 function testP521() {
-  e2e.ecc.eccTester.runBenchmarkForCurve(
+  e2e.ecc.eccTester.runEcdsaBenchmarkForCurve(
     e2e.ecc.PrimeCurve.P_521);
+}
+
+function testP256_ecdh() {
+  e2e.ecc.eccTester.runEcdhBenchmarkForCurve(
+    e2e.ecc.PrimeCurve.P_256);
+}
+
+function testP384_ecdh() {
+  e2e.ecc.eccTester.runEcdhBenchmarkForCurve(
+    e2e.ecc.PrimeCurve.P_384);
+}
+
+function testP521_ecdh() {
+  e2e.ecc.eccTester.runEcdhBenchmarkForCurve(
+    e2e.ecc.PrimeCurve.P_521);
+}
+
+function testCurve25519_ecdh() {
+  e2e.ecc.eccTester.runEcdhBenchmarkForCurve(
+    e2e.ecc.PrimeCurve.CURVE_25519);
 }
 
 </script>
