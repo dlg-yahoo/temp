@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2013 Google Inc. All rights reserved.
+ * Copyright 2014 Google Inc. All rights reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  *
- * @fileoverview A representation of an element in a prime field.
+ * @fileoverview A representation of an element in a finite field.
  * @author thaidn@google.com (Thai Duong)
  */
 
@@ -33,7 +33,7 @@ goog.require('goog.asserts');
  * Representation of an element in a prime field. Throws
  *     e2e.error.InvalidArgumentsError if the element is
  *     larger than or equal to the field modulus.
- * @param {!e2e.BigPrimeNum} q The modulus of the prime field.
+ * @param {!e2e.BigPrimeNum} q The order of the prime field.
  * @param {!e2e.BigNum} x The value of this element.
  * @constructor
  */
@@ -50,14 +50,14 @@ e2e.ecc.Element = function(q, x) {
 
 
 /**
- * The value of this element. It should be in [0, modulus - 1].
+ * The value of this element. It should be in [0, order - 1].
  * @type {!e2e.BigNum}
  */
 e2e.ecc.Element.prototype.x;
 
 
 /**
- * The modulus of the prime field. It should be a prime.
+ * The order of the finite field. It should be a prime power.
  * @type {!e2e.BigPrimeNum}
  */
 e2e.ecc.Element.prototype.q;

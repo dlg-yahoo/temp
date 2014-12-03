@@ -29,8 +29,10 @@ goog.require('e2e.BigPrimeNum');
 goog.require('e2e.FastModulus');
 goog.require('e2e.ecc.constant');
 goog.require('e2e.ecc.constant.ed_25519.G_FAST_MULTIPLY_TABLE');
+goog.require('e2e.ecc.constant.nums_w521.G_FAST_MULTIPLY_TABLE');
 goog.require('e2e.ecc.constant.p_256.G_FAST_MULTIPLY_TABLE');
 goog.require('e2e.ecc.constant.p_384.G_FAST_MULTIPLY_TABLE');
+goog.require('e2e.ecc.constant.p_521.G_FAST_MULTIPLY_TABLE');
 goog.require('e2e.ecc.curve.Curve25519');
 goog.require('e2e.ecc.curve.Ed25519');
 goog.require('e2e.ecc.curve.Nist');
@@ -53,7 +55,8 @@ e2e.ecc.PrimeCurve = {
   'P_384': 'P_384',
   'P_521': 'P_521',
   'CURVE_25519': 'CURVE_25519',
-  'ED_25519': 'ED_25519'
+  'ED_25519': 'ED_25519',
+  'NUMS_W521': 'NUMS_W521'
 };
 
 
@@ -66,7 +69,12 @@ e2e.ecc.PrimeCurveOid = {
   // First byte is the length of what comes next.
   'P_256': [0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07],
   'P_384': [0x05, 0x2B, 0x81, 0x04, 0x00, 0x22],
-  'P_521': [0x05, 0x2B, 0x81, 0x04, 0x00, 0x23]
+  'P_521': [0x05, 0x2B, 0x81, 0x04, 0x00, 0x23],
+  // iso(1).identified-organization(3).dod(6).internet(1).private(4)
+  // .enterprise(1).Yahoo!(4278).internal-curves(131)
+  // .field-bitlength(521).(curve-number)1
+  'NUMS_W521': [0x0e, 0x06, 0x0C, 0x2B, 0x06, 0x01, 0x04, 0x01,
+                0xA1, 0x36, 0x81, 0x03, 0x84, 0x09, 0x01]
 };
 
 
@@ -163,6 +171,7 @@ e2e.ecc.DomainParam.fromCurve = function(curveName) {
     case e2e.ecc.PrimeCurve.P_256:
     case e2e.ecc.PrimeCurve.P_384:
     case e2e.ecc.PrimeCurve.P_521:
+    case e2e.ecc.PrimeCurve.NUMS_W521:
       result = e2e.ecc.DomainParam.NIST.fromCurve(curveName);
       break;
     case e2e.ecc.PrimeCurve.CURVE_25519:
@@ -248,10 +257,20 @@ e2e.ecc.DomainParam.NIST.fromCurve = function(curveName) {
     constants = e2e.ecc.constant.P_256;
     fastModulus = e2e.ecc.fastModulus.Nist.P_256;
     fastMultiplyTable = e2e.ecc.constant.p_256.G_FAST_MULTIPLY_TABLE;
-  } else {
+  } else if (curveName === e2e.ecc.PrimeCurve.P_384) {
     constants = e2e.ecc.constant.P_384;
     fastModulus = e2e.ecc.fastModulus.Nist.P_384;
     fastMultiplyTable = e2e.ecc.constant.p_384.G_FAST_MULTIPLY_TABLE;
+  } else if (curveName === e2e.ecc.PrimeCurve.P_521) {
+    constants = e2e.ecc.constant.P_521;
+    fastModulus = e2e.ecc.fastModulus.FFFFFF;
+    fastMultiplyTable = e2e.ecc.constant.p_521.G_FAST_MULTIPLY_TABLE;
+  } else if (curveName === e2e.ecc.PrimeCurve.NUMS_W521) {
+    constants = e2e.ecc.constant.P_521;
+    fastModulus = e2e.ecc.fastModulus.FFFFFF;
+    fastMultiplyTable = e2e.ecc.constant.nums_w521.G_FAST_MULTIPLY_TABLE;
+  } else {
+    throw new e2e.error.InvalidArgumentsError('Unknown NIST-style curve.');
   }
   var q = new e2e.BigPrimeNum(constants.Q);  // prime field
   var b = new e2e.BigPrimeNum(constants.B);  // parameter of curve
